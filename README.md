@@ -1,8 +1,11 @@
-###### Con este script se pueden descargar videos de 4 formas: Video y audio (Basico y Calidad), solo el video y solo el audio. Para poder utilizar este script de python hace falta tener instalado:
+#### Con este script se pueden descargar videos de 4 formas: Video y audio (Basico y Calidad), solo el video y solo el audio. Para poder utilizar este script de python hace falta tener instalado:
 - Pytube
 - Moviepy
 
 ------------
 
-**Screnshoot:**
-![image](https://github.com/macheting/Youtube-Downloader/assets/151371549/1f920f4e-3bb6-4bfb-8878-9fa82eb04c19)
+**Screenshot:**
+
+![Screenshot](https://github.com/macheting/Youtube-Downloader/assets/151371549/1f920f4e-3bb6-4bfb-8878-9fa82eb04c19)
+
+
