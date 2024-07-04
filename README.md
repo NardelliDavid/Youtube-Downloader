@@ -1,4 +1,4 @@
-## YT downloader
+## Youtube Downloader
 
 #### Con este script se pueden descargar videos de 4 formas: Video y audio (Basico y Calidad), solo el video y solo el audio. Para poder utilizar este script de python hace falta tener instalado:
 - Pytube
