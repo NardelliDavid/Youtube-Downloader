@@ -1,9 +1,10 @@
 import tkinter as tk
+import os
+import threading
+import multiprocessing
 from tkinter import messagebox, ttk
 from pytube import YouTube
-import os
 from moviepy.editor import VideoFileClip, AudioFileClip
-import threading
 
 # Crear la ventana de la app
 root = tk.Tk()
@@ -35,22 +36,33 @@ def descargar_en_hilo():
         
         # Verifica qué opción seleccionó el usuario
         if tipo_descarga_seleccionada == "Solo video":
-            stream = yt.streams.filter(only_video=True, file_extension='mp4').order_by('resolution').desc().first() # Solo video
+            # Filtra el video por resolucion desde 1080p a 720p, si no existe ninguna de esas resoluciones selecciona la mas alta posible
+            stream = yt.streams.filter(only_video=True, file_extension='mp4', res="1080p").first()
+            if not stream :
+                 stream = yt.streams.filter(only_video=True, file_extension='mp4', res="720p").first()
+            if not stream :
+                 stream = yt.streams.filter(only_video=True, file_extension='mp4').order_by('resolution').desc().first()
             filename = "VSI_"+stream.default_filename # Nombre que tendrá el archivo
-            stream.download(output_path=descargas_ruta, filename=filename)
+            stream.download(output_path=descargas_ruta, filename=filename) # Descarga el video
             messagebox.showinfo("Informacion", f"Se descargó: {tipo_descarga_seleccionada}\nArchivo: {filename}")
         elif tipo_descarga_seleccionada == "Solo audio":
             stream = yt.streams.filter(only_audio=True, file_extension='mp4').first() # Solo audio
             filename = "SA_"+stream.default_filename # Nombre que tendrá el archivo
-            stream.download(output_path=descargas_ruta, filename=filename)
+            stream.download(output_path=descargas_ruta, filename=filename) # Descarga el audio
             messagebox.showinfo("Informacion", f"Se descargó: {tipo_descarga_seleccionada}\nArchivo: {filename}")
         elif tipo_descarga_seleccionada == "Video y Audio (Basico)":
-            stream = yt.streams.get_highest_resolution() # Video y audio
+            stream = yt.streams.get_highest_resolution()
             filename = "VAS_"+stream.default_filename # Nombre que tendrá el archivo
             stream.download(output_path=descargas_ruta, filename=filename)
             messagebox.showinfo("Informacion", f"Se descargó: {tipo_descarga_seleccionada}\nArchivo: {filename}")
         elif tipo_descarga_seleccionada == "Video y Audio (Calidad)":
-            video_stream = yt.streams.filter(only_video=True, file_extension='mp4').order_by('resolution').desc().first()
+            # Filtra el video por resolucion desde 1080p a 720p, si no existe ninguna de esas resoluciones selecciona la mas alta posible
+            video_stream = yt.streams.filter(only_video=True, file_extension='mp4', res="1080p").first()
+            if not video_stream :
+                 video_stream = yt.streams.filter(only_video=True, file_extension='mp4', res="720p").first()
+            if not video_stream :
+                video_stream = yt.streams.filter(only_video=True, file_extension='mp4').order_by('resolution').desc().first()
+            # Obtiene el audio del video
             audio_stream = yt.streams.filter(only_audio=True, file_extension='mp4').first()
 
             # Obtiene el nombre del audio y el video
@@ -77,7 +89,7 @@ def descargar_en_hilo():
                 name_final_video = 'VAC_' + video_stream.default_filename
 
                 # Guarda el video fusionado en descargas
-                final_clip.write_videofile(os.path.join(descargas_ruta, name_final_video))
+                final_clip.write_videofile(os.path.join(descargas_ruta, name_final_video), codec='libx264', audio_codec='aac', bitrate="10000k", audio_bitrate="192k", threads=multiprocessing.cpu_count())
 
                 # Liberar los recursos
                 video_clip.close()
@@ -106,7 +118,7 @@ def descargar_en_hilo():
         lista_descargas.config(state='readonly')
         vaciar_boton.config(state="normal")
 
-# Función para manejar la descarga en un hilo separado
+# Función para manejar la descarga en un hilo separado y evitar que la aplicacion se congele
 def obtenerURL():
     threading.Thread(target=descargar_en_hilo).start()
 
